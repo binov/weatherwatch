@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "../components/header";
 import CityInputForm from "../containers/city_input_form";
-import WeatherList from "../containers/weather_list";
+import MainBody from "../containers/main_body";
 
 export default class App extends Component {
   render() {
@@ -10,7 +10,8 @@ export default class App extends Component {
         <Header />
         <div className="container" style={{ paddingTop: "65px" }}>
           <CityInputForm />
-          <WeatherList />
+
+          <MainBody />
         </div>
       </div>
     );

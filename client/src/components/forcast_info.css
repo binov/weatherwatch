@@ -1,0 +1,9 @@
+.box-field {
+  width: 50%;
+  display: inline-block;
+}
+
+.range-selector {
+  width: 300px;
+  margin-left: 170px;
+}

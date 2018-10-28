@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import RechartRenderer from "../components/recharts_renderer";
 import * as actions from "../actions";
 import GoogleMap from "../components/google_map";
 import "./weather_list.css";
 import uuid from "uuid/v1";
+import ForcastInfo from "../components/forcast_info";
 class WeatherList extends Component {
   componentDidMount() {
     this.props.fetchWeatherAll();
@@ -13,17 +13,19 @@ class WeatherList extends Component {
   renderWeather() {
     if (this.props.weather.length > 0) {
       return this.props.weather.map((cityData, index) => {
-        const { tempData, minRef, maxRef, lat, lon } = cityData;
+        const { tempData, minRef, maxRef, lat, lon, num_days } = cityData;
+
         return (
           <tr key={uuid()}>
             <td>
               <GoogleMap lon={lon} lat={lat} />
             </td>
             <td>
-              <RechartRenderer
-                data={tempData}
+              <ForcastInfo
+                tempData={tempData}
                 minRef={minRef}
                 maxRef={maxRef}
+                num_days={num_days}
               />
             </td>
           </tr>

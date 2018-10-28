@@ -8,23 +8,29 @@ const moment = require("moment");
 module.exports = app => {
   app.post("/api/weatherinfo", async (req, res) => {
     const { countryCode, cityName, minTemp, maxTemp } = req.body;
-    const weatherInfo = new WeatherInfo({ cityName, minTemp, maxTemp });
+    const weatherInfo = new WeatherInfo({
+      countryCode,
+      cityName,
+      minTemp,
+      maxTemp
+    });
     const cityUrl = `${keys.ROOT_URL}&q=${cityName},${countryCode}`;
     let weather;
     try {
       weather = await axios.get(cityUrl);
     } catch (error) {
-      res.sendStatus(400).send("Invalid Input");
+      return res.status(400).send("Invalid Input");
     }
     // if valid, save to db
     if (weather) {
       try {
         await weatherInfo.save();
       } catch (error) {
-        res.sendStatus(422).send("Unable to process/save");
+        return res.status(422).send("Unable to process/save");
       }
       let fullResponse = {
-        city_list: []
+        city_list: [],
+        totalCount: undefined
       };
       constructResponse(weather, fullResponse, minTemp, maxTemp);
       res.send(fullResponse);
@@ -33,17 +39,32 @@ module.exports = app => {
 
   app.get("/api/weatherinfo", async (req, res) => {
     let cityData, weather;
+    var pageNo = parseInt(req.query.pageNo);
+    var size = parseInt(req.query.size);
+
+    if (pageNo < 0 || pageNo === 0) {
+      return res.status(400).send("Page number not valid");
+    }
+
+    try {
+      totalCount = await WeatherInfo.countDocuments();
+    } catch (error) {
+      return res.status(400).send("Invalid Input/DB Issue");
+    }
     try {
       cityData = await WeatherInfo.find()
         .sort("-_id")
-        .limit(keys.PAGE_SIZE)
+        .skip(size * (pageNo - 1))
+        .limit(size)
         .exec();
     } catch (error) {
-      res.sendStatus(400).send("Invalid Input/DB Issue");
+      return res.status(400).send("Invalid Input/DB Issue");
     }
+
     if (cityData.length > 0) {
       let fullResponse = {
-        city_list: []
+        city_list: [],
+        totalCount
       };
       const cityUrls = cityData.map(cityRecord => {
         return axios(
@@ -53,7 +74,7 @@ module.exports = app => {
       try {
         weather = await Promise.all(cityUrls);
       } catch (error) {
-        res.sendStatus(500).send("Data Access Issue");
+        return res.status(500).send("Data Access Issue");
       }
       if (weather) {
         weather.forEach((location, cityIndex) => {
@@ -68,7 +89,7 @@ module.exports = app => {
       }
     } else {
       // No Content
-      res.sendStatus(204).send("No Content");
+      res.status(204).send("No Content");
     }
   });
 };

@@ -25,8 +25,16 @@ export default class RechartRenderer extends Component {
   }
 
   render() {
+    let labelMax, labelMin;
+    if (this.props.maxRef === this.props.minRef) {
+      labelMax = "Reference";
+      labelMin = "";
+    } else {
+      labelMax = "Max";
+      labelMin = "Min";
+    }
     return (
-      <div>
+      <div className="box-field">
         <LineChart
           width={600}
           height={300}
@@ -52,14 +60,14 @@ export default class RechartRenderer extends Component {
           <ReferenceLine
             y={this.props.maxRef}
             yAxisId="left"
-            label="Max"
+            label={labelMax}
             stroke="red"
             strokeDasharray="3 3"
           />
           <ReferenceLine
             y={this.props.minRef}
             yAxisId="left"
-            label="Min"
+            label={labelMin}
             stroke="red"
             strokeDasharray="3 3"
           />

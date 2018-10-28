@@ -1,12 +1,14 @@
-import { FETCH_WEATHER, FETCH_WEATHER_ALL } from "../actions/index.js";
+import { FETCH_WEATHER_ALL, FETCH_WEATHER } from "../actions/action_types";
 export default function(state = [], action) {
   switch (action.type) {
     case FETCH_WEATHER:
-      return action.payload.data
+      return action.payload && action.payload.data
         ? [...action.payload.data.city_list, ...state]
         : state;
     case FETCH_WEATHER_ALL:
-      return action.payload.data ? [...action.payload.data.city_list] : [];
+      return action.payload && action.payload.data
+        ? [...action.payload.data.city_list]
+        : [];
     default:
       break;
   }
